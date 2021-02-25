@@ -12,7 +12,14 @@ def MainCap(dev_num, cam_num):
     command02 = f'ffmpeg -f v4l2 -input_format mjpeg -framerate 30 -f segment -video_size 1920x1080 \
         -ts mono2abs -i {input_path}   -c:v copy -y\
         -copyts -segment_time 00:10:00 {output_path}%02d.mkv'
-    subprocess.call(command02, shell=True)
+
+
+    command03 = f'ffmpeg -f v4l2 -input_format mjpeg -video_size 1920x1080 -framerate 30 \
+        -i {input_path} -c:v copy \
+        -f segment -segment_time 30 -segment_wrap 10 \
+        {output_path}%02d.mkv'
+
+    subprocess.call(command03, shell=True)
 
 
 
