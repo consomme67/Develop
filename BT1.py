@@ -14,6 +14,11 @@ def MainCap(dev_num, cam_num):
         -copyts -segment_time 00:10:00 {output_path}%02d.mkv'
     subprocess.call(command02, shell=True)
 
+
+
+"""-f segment -strftime 1 -segment_time 60 -segment_format mp4 %Y-%m-%d_%H-%M-%S"""
+#aaaaaaaaaaaaaaaaaaaaaaaaaa
+
 if __name__ == "__main__":
 #    ste == os.path.exists("/home/pi/doc/start.txt")
 
