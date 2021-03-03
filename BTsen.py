@@ -43,5 +43,5 @@ def count_sen():
 
 if __name__ == '__main__':
     print("===START===")
-    time.sleep(3)
+
     count_sen()
