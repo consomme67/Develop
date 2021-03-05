@@ -1,6 +1,7 @@
 import queue
 import requests
 import os
+import subprocess
 
 def kinnjiti_central():
     #fxt = os.stat("ファイルパス").st_size == 0
@@ -10,17 +11,15 @@ def kinnjiti_central():
     if not fxt:
         aaa = []
         nearTime = queue.Queue()
-        print("a\n")
         with open("textTest") as t:
             nt = t.readlines()
-            print(nt)
-
         for i in nt:
             nearTime.put(i.split())
-        print(nearTime)
-        print(nearTime.empty())
-        print(nearTime.get())
-        print(nearTime.get())
+
+        #print(nearTime.empty())
+        #print(type(nearTime.get()))
+        #k = int(nearTime.get()[0])
+
         #print(nearTime.get())
         #print(nearTime.empty())
         return nearTime
@@ -43,7 +42,22 @@ def kinnjiti_central():
 
 def cut():
     print("cut処理")
-
+    print("各カメラフォルダからnearTimeキューから出したタイムで切り出し")
+    print("それぞれのファイルを共有フォルダからコピーする？")
+    print("切り出し方は1,2はカット，3-...はフレームで")
+    #始点カメラ用(-5秒から5秒間)
+    command01 = f'ffmpeg -seek_timestamp 1 -ss {centime - 5000} -i {input_path} -t 5 -framerate 30\
+            -c:v copy -y /home/pi/doc/mov/cam{cam_num}.mkv'
+    subprocess.call(command01, shell=True)
+    #終点カメラ用(+1秒から5秒間)
+    command02 = f'ffmpeg -seek_timestamp 1 -ss {centime + 1000} -i {input_path} -t 5 -framerate 30\
+            -c:v copy -y /home/pi/doc/mov/cam{cam_num}.mkv'
+    subprocess.call(command02, shell=True)
+    #中間フレーム用
+    #11枚の画像を33ミリ秒毎に切り出す(for文で(i++))
+    j=i*33 #11枚(1枚3フレずつ=990ミリ秒≒1秒と考える)
+    command03 = f'ffmeg -seek_timestamp 1 -ss {centime + j} -i {各フォルダ} -r 30 \
+            {output_path}~~~~{i}.png'
 
 def send():
     url = "https://sirius.e-catv.ne.jp/shimanami_movie/int/api/upload_movie/"
@@ -60,7 +74,7 @@ def main():
 
     print("==main==")
     if not main_que.empty():
-        i = main_que.get()
+        i = int(main_que.get()[0])
         print(i)
     else:
         print("queの中身無いから戻す")
