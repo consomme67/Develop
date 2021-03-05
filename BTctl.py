@@ -55,10 +55,18 @@ def cut():
     subprocess.call(command02, shell=True)
     #中間フレーム用
     #11枚の画像を33ミリ秒毎に切り出す(for文で(i++))
-    j=i*33 #11枚(1枚3フレずつ=990ミリ秒≒1秒と考える)
-    command03 = f'ffmeg -seek_timestamp 1 -ss {centime + j} -i {各フォルダ} -r 30 \
-            {output_path}~~~~{i}.png'
-
+    i=1
+    while i<12:
+        j=i*33 #11枚(1枚3フレずつ=990ミリ秒≒1秒と考える)
+        command03 = f'ffmeg -seek_timestamp 1 -ss {centime + j} -i {各フォルダ} -r 30 \
+                {output_path}~~~~{i}.png'
+        i=+1
+def test():
+    a=1
+    while a<12:
+        b = a*3*33
+        print(a,b)
+        a+=1
 def send():
     url = "https://sirius.e-catv.ne.jp/shimanami_movie/int/api/upload_movie/"
     video = open('for_send/WIN_20210212_13_18_37_Pro.mp4', 'rb')
@@ -102,4 +110,4 @@ def hoge():
 
 if __name__=='__main__':
     print("==start==")
-    main()
+    test()
