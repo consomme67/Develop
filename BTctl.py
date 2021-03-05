@@ -59,11 +59,11 @@ def cut():
     while i<12:
         j=i*33 #11枚(1枚3フレずつ=990ミリ秒≒1秒と考える)
         command03 = f'ffmeg -seek_timestamp 1 -ss {centime + j} -i {各フォルダ} -r 30 \
-                {output_path}~~~~{i}.png'
+                -vframes 1 {output_path}~~~~{i}.png'
         i=+1
 def test():
-    a=1
-    while a<12:
+    a=0
+    while a<11:
         b = a*3*33
         print(a,b)
         a+=1
