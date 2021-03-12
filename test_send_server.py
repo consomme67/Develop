@@ -19,10 +19,33 @@ def send():
 
     #data = {'another_key': 'another_value'}
     r = requests.post(url, files=files)
+    print(r.url)
+    print(r.text)
+    print(r.status_code)
+    print(r.content)
+
+def get():
+    url = "https://sirius.e-catv.ne.jp/shimanami_movie/int/api/get_beacon_timestamp_list/"
+    #?timestamp=1614923129
+    files = {
+        'timestamp': '1614923129'
+    }
+    r = requests.get(url, params=files)
+    print(r.url)
+    print(r.text)
+    print(r.status_code)
+    print(r.content)
+    url = "https://sirius.e-catv.ne.jp/shimanami_movie/int/api/get_beacon_timestamp_list/"
+    #?timestamp=1614923129
+    files = {
+        'timestamp': '1614923130'
+    }
+    r = requests.get(url, params=files)
+    print(r.url)
     print(r.text)
     print(r.status_code)
     print(r.content)
 
 if __name__ == "__main__":
-    send()
+    get()
     #test
