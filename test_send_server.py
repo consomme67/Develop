@@ -31,10 +31,12 @@ def get():
         'timestamp': '1614923129'
     }
     r = requests.get(url, params=files)
-    print(r.url)
-    print(r.text)
-    print(r.status_code)
-    print(r.content)
+    ttt = r.text
+    print(type(r.json()))
+    #print(r.url)
+    #print(r.text)
+    #print(r.status_code)
+    #print(r.content)
     url = "https://sirius.e-catv.ne.jp/shimanami_movie/int/api/get_beacon_timestamp_list/"
     #?timestamp=1614923129
     files = {
@@ -46,6 +48,26 @@ def get():
     print(r.status_code)
     print(r.content)
 
+def beacon_GET(lasttime):
+    """鯖からとってきてキュー作ってそこにＩＤとtimestamp放り込む"""
+    tm = lasttime
+    aaa = None
+    url = "https://sirius.e-catv.ne.jp/shimanami_movie/int/api/get_beacon_timestamp_list/"
+    files = {
+        'timestamp': tm
+    }
+    r = requests.get(url, params=files)
+    return r.json(),aaa
+
+def test():
+    bb = beacon_GET(0)
+    try:
+        bb[1]
+        print(bb[0])
+    except:
+        print("無し")
+        return
+    print("koko")
 if __name__ == "__main__":
-    get()
+    test()
     #test

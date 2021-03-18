@@ -17,6 +17,12 @@ def kinnjiti_central():
             t.truncate(0)
         for i in nt:
             nearTime.put(i.split())
+            if not os.path.exists("time_log"):
+                with open("time_log", mode="w") as l:
+                    l.write("")
+            with open("time_log", mode="a") as l:
+                l.write(i+"\n")
+
 
         #print(nearTime.empty())
         #print(type(nearTime.get()))
@@ -42,7 +48,7 @@ def kinnjiti_central():
         return
 """
 
-def cut():
+def cut(time):
     print("cut処理")
     print("各カメラフォルダからnearTimeキューから出したタイムで切り出し")
     #それぞれのファイルを共有フォルダからコピーする？
@@ -65,12 +71,12 @@ def cut():
         subprocess.call(command03, shell=True)
         i=+1
 
-def generate():
+def generate(time):
     #切り出したフレームを結合
     command00 = f'ffmpeg -f image2 -r 30 -i pic/%d.jpg -r 15 -an -q:v 0 -y pic/video/video.mp4'
     subprocess.call(command00, shell=True)
     #始+中+終を結合
-    command01 = f'ffmpeg -f concat -i -c copy output.mp4'
+    command01 = f'ffmpeg -f concat -i {ファイル名} -c copy output.mp4'
 
 
 def send():
@@ -86,12 +92,17 @@ def send():
 def main():
     print("==main==")
     main_que = kinnjiti_central()
-    try:
-        i = int(main_que.get()[0])
-        print(i)
-    except:
-        print("queの中身無いから戻す")
-    return
+    while True:
+        try:
+            i = int(main_que.get()[0])
+            print(i)
+            cut(i)
+            generate(i)
+            send()
+        except:
+            print("--nothing--")
+            return
+
 """
     if not main_que.empty():
         i = int(main_que.get()[0])
