@@ -23,11 +23,13 @@ def count_sen():
     if (GPIO.input(GPIO_PIN) == GPIO.HIGH):
         nowmil = str(int(time.time() * 1000))
         try:
-            with open("/home/pi/doc/central.txt", mode='a') as c:
+            print(nowmil)
+            with open("/home/pi/doc/sen/sensor.txt", mode='a') as c:
                 c.write(nowmil+'\n')
         except:
             time.sleep(2)
-            with open("/home/pi/doc/central.txt", mode='a') as c:
+            print(nowmil)
+            with open("/home/pi/doc/sen/sensor.txt", mode='a') as c:
                 c.write(nowmil+'\n')
         time.sleep(SLEEPTIME)
     else:
@@ -36,4 +38,7 @@ def count_sen():
 if __name__ == '__main__':
     print("===START===")
     while True:
-        count_sen()
+        try:
+            count_sen()
+        except KeyboardInterrupt:
+            GPIO.cleanup()

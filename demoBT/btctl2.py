@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import subprocess
 import numpy as np
+import pickle
 
 def main():
     timestamp = check()
@@ -72,14 +73,17 @@ def check():
     if os.path.isfile("/home/pi/docs/sen/timestamp.txt") and os.path.getsize("/home/pi/docs/sen/timestamp.txt")>0:
         with open("/home/pi/docs/sen/timestamp.txt", mode="r+")as s:
         #with open("/home/pi/docs/sen/GetBeacon.txt", mode="r")as s:
-            aaa = s.readlines()
+            datadict = pickle.load(s)
+            #aaa = s.readlines()
             #print(aaa)
             s.truncate(0)
+            """
             for i in aaa:
                 with open("/home/pi/timestamp_log.txt", mode="a")as t:
                     t.write(i)
+            """
             #print("bbb")
-        return aaa
+        return datadict
     else:
         #print("aaaaaaa")
         return
