@@ -1,1 +1,58 @@
-<mxfile host="app.diagrams.net" modified="2021-09-22T01:36:57.816Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36" version="15.2.9" etag="U-Xgr_EjJKTdXv9VogBx" type="github"><diagram id="AKFJ4KNgcF9bpCG8dEuc">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2021-09-22T01:52:20.980Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36" etag="I_jD02mXdVOJTctoj0Fa" version="15.2.9" type="github">
+  <diagram id="AKFJ4KNgcF9bpCG8dEuc" name="Page-1">
+    <mxGraphModel dx="1038" dy="547" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tIsUctwTk5HvjvhstKWM-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="tIsUctwTk5HvjvhstKWM-1" target="tIsUctwTk5HvjvhstKWM-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-1" value="CH選択" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tIsUctwTk5HvjvhstKWM-3" target="tIsUctwTk5HvjvhstKWM-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-3" value="クリックした行のeventからhtml要素のid取得" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tIsUctwTk5HvjvhstKWM-4" target="tIsUctwTk5HvjvhstKWM-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-4" value="取得idより，行全体からどのCHが選択されたか特定" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="tIsUctwTk5HvjvhstKWM-7" target="tIsUctwTk5HvjvhstKWM-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-7" value="特定したCH番号から、ch_listより該当chのchelementを参照" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="250" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-9" value="chelementに存在するものに対応する各パック＆オプションリストに挿入" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="340" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="tIsUctwTk5HvjvhstKWM-13" target="tIsUctwTk5HvjvhstKWM-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="tIsUctwTk5HvjvhstKWM-13" target="tIsUctwTk5HvjvhstKWM-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-13" value="既に選択済みのCHか" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="160" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-20" value="選択CHを各パック＆オプションリストから削除" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-22" value="Y" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="330" y="190" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-23" value="N" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="240" y="220" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tIsUctwTk5HvjvhstKWM-24" value="情報の取得に使用している&lt;br&gt;onckick()がsafari,FireFoxでは不具合が起きる&lt;br&gt;e(自分情報)がうまく渡されない" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;position2=0.58;rotation=0;base=20;spacing=3;verticalAlign=middle;rounded=0;direction=west;" vertex="1" parent="1">
+          <mxGeometry x="20" y="220" width="120" height="140" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
