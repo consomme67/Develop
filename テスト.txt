@@ -1,0 +1,6 @@
+Time : 20230715101901
+ALL : 14
+Area1 : 13
+Area2 : 0
+Area3 : 2
+Area4 : 0
