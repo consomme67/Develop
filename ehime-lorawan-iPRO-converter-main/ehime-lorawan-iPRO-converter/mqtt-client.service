@@ -1,0 +1,15 @@
+[Unit]
+Description=MQTT Client Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/restar/ehime-lorawan-iPRO-converter/mqtt-client.py
+WorkingDirectory=/home/restar/ehime-lorawan-iPRO-converter
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=restar
+
+[Install]
+WantedBy=multi-user.target
+

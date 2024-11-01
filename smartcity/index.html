@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<title>SmartCity API公開ページ | 愛媛ＣＡＴＶ</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})
+  (window,document,'script','dataLayer','GTM-N4PDD7H');
+</script>
+<!-- End Google Tag Manager -->
+
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
+<link rel="stylesheet" type="text/css" href="common/files/libs/destyle.css"/>
+<link rel="stylesheet" type="text/css" href="files/css/form_common.css?37"/>
+<script type="text/javascript" src="common/files/libs/jquery-1.12.4.min.js"></script>
+<script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N4PDD7H" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <header id="header">
+    <h1 class="logo">
+      <img src="files/img/logo_2.png" width="118" height="21"/>
+    </h1>
+  </header>
+
+  <div class="container">
+    <div class="c1">
+      <center>
+        <h1>愛媛CATV スマートシティAPI</h1>
+      </center>
+    </div>
+    <hr>
+
+    <div class="c2">
+      <h3>オープンデータとは</h3>
+      <p>　オープンデータとは、誰でも自由に利用・再利用・再配布できる形で公開されたデータのことを指します。<br>
+        この度ご提供させていただくオープンデータは弊社（株式会社愛媛CATV）にて収集、整理したものをAPIを通して公開をしております。<br>
+        ※データ提供元様より許可を得次第の公開となりますため、公開している項目に変更が生じます。ご了承ください。
+      </p>
+      <h3>公開API（データ形式）について</h3>
+      <p>　本APIは<b>JSON</b>フォーマットを使用しており、その中でも<font color="red"><u>NGSIv2</u></font>と呼ばれるRESTfull APIをご利用いただけます。<br>
+      <h3>NGSIv2の基本構造とご利用方法</h3>
+      <h4><img src="./files/img/pic-01.png" height="120"></h4>
+      <p>　NGSIv2 (Next Generation Service Interface version 2) は、FIWARE の Orion Context Broker などで利用される API で、
+        IoT やスマートシティアプリケーションにおけるコンテキストデータの管理と共有を行います。<br>
+        NGSIv2 では、コンテキスト情報 (例えば、センサーのデータやユーザーの情報) をエンティティ、属性、メタデータとして扱います。<br>
+        <span style="font-size: small; color: dimgrey;">詳しい利用方法は<u><a href="https://fiware-orion.letsfiware.jp/user/ngsiv2_implementation_notes/">公式ドキュメント</a></u>をご参照ください</span>
+      </p>
+      
+    </div>
+    <hr>
+
+    <div>
+        <h2>
+          API一覧
+        </h2>
+        <table>
+          <thead>
+              <tr>
+                  <th scope="col">項目名</th>
+                  <th scope="col">データの内容</th>
+                  <th scope="col">API参照</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <th>松山市_自治体HP更新データ</th>
+                  <th>松山市の自治体HPにて更新されているデータをまとめたもの</th>
+                  <th><u><a href="https://fiware-sc.e-catv.ne.jp/jp.ehime.oshiraseCH.hpnews-inf.oshiraseCH-asset120">こちらから</a></u></th>
+              </tr>
+
+          </tbody>
+            
+        </table>
+    </div>
+
+  </div>
+
+
+
+<footer id="footer">
+  <div id="footer_inner">
+    <p style="text-align:right;">Copyright &copy; EHIME CATV, Inc.</p>
+  </div>
+</footer>
+
+<script type="text/javascript" src="files/js/common.js?008"></script>
+</body>
+</html>
