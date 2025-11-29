@@ -557,27 +557,29 @@ def send(context):
 
 def main():
     global stop_capture
-    user = "admin"
-    password = urllib.parse.quote_plus("eC@tv5001")
-    server_ip = "192.168.0.10"
 
-    mqtt_conf = config["mqtt"]
-    mqtt_client = mqtt_connect(
-        broker=mqtt_conf["host"],
-        port=mqtt_conf["port"],
-        username=mqtt_conf.get("user"),
-        password=mqtt_conf.get("pass")
-    )
+    config = open('./config.json', 'r')
+    data = json.load(config)
+
+    user = data['user']
+    password = urllib.parse.quote_plus(data['password'])
+    server_ip = data['cam_ip']
+    url = data['url']
+
+    mqtt_user = data['mqtt_connect']['user']
+    mqtt_password = data['mqtt_connect']['password']
+    topic = data['mqtt_connect']['topic']
 
 
-
-    parser = argparse.ArgumentParser(description='RTSPストリームビューアとパケットキャプチャ (RTP-107検出機能付き)')
-    parser.add_argument('--url', '-u', help='RTSP URL', default=f"rtsp://{user}:{password}@{server_ip}/ONVIF/MediaInput?profile=def_profile4")
-    parser.add_argument('--no-video', '-n', action='store_true', help='映像表示を無効化（パケットキャプチャのみ）')
-    args = parser.parse_args()
+    #parser = argparse.ArgumentParser(description='RTSPストリームビューアとパケットキャプチャ (RTP-107検出機能付き)')
+    #parser.add_argument('--url', '-u', help='RTSP URL', default=f"rtsp://{user}:{password}@{server_ip}/ONVIF/MediaInput?profile=def_profile4")
+    #parser.add_argument('--no-video', '-n', action='store_true', help='映像表示を無効化（パケットキャプチャのみ）')
+    #args = parser.parse_args()
 
     # RTSP URLの入力
-    rtsp_url = args.url
+    #rtsp_url = args.url
+    rtsp_url = url.format(user=user,password=password,server_ip=server_ip)
+
 
     # キャプチャインターフェースを選択
     #interface = select_capture_interface()
@@ -591,18 +593,8 @@ def main():
     capture_thread = threads[0]
 
     try:
-        # 映像表示が不要な場合はここでパケットキャプチャのみ実行
-        if args.no_video:
-            print("映像表示なし。パケットキャプチャのみを実行します。")
-            print("終了するには Ctrl+C を押してください。")
-            try:
-                while True:
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                print("\n中断されました")
-        else:
-            # 映像表示を実行
-            run_video_display(rtsp_url, capture_thread, threads)
+        # 映像表示を実行
+        run_video_display(rtsp_url, capture_thread, threads)
     finally:
         # 終了処理
         stop_capture = True
@@ -610,17 +602,7 @@ def main():
             t.join(timeout=3)
         print("終了しました")
 
-
 if __name__ == "__main__":
     # このスクリプトは管理者/root権限が必要
-    print("RTSP ストリームビューア & RTP-107パケットキャプチャツール (TCP/UDP対応)")
-
-    # 必要なライブラリの確認
-    try:
-        import netifaces
-    except ImportError:
-        print("netifacesライブラリがインストールされていません。")
-        print("pip install netifaces でインストールしてください。")
-        sys.exit(1)
-
+    #print("RTSP ストリームビューア & RTP-107パケットキャプチャツール (TCP/UDP対応)")
     main()
