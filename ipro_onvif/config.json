@@ -1,13 +1,15 @@
 {
-  "name" : "location-A",
+  "name" : "location-AAA",
   "cam_ip" : "192.168.0.10",
   "user" : "admin",
   "password" : "eC@tv5001",
   "port" : 554,
-  "url" : "rtsp://{user}:{password}@{server_ip}/ONVIF/MediaInput?profile=def_profile4",
+  "rtsp_url" : "rtsp://{user}:{password}@{server_ip}/ONVIF/MediaInput?profile=def_profile4",
   "mqtt_connect" : {
+    "broker_ip" : "210.87.234.8",
+    "port" : "1883",
     "user" : "ipro_user",
-    "password" : "Mp7YGfUz",
-    "topic" : "car-speed-measure"
+    "password" : "Ui5T9fqP",
+    "topic" : "speed-measure"
   }
 }
