@@ -1,4 +1,5 @@
 import queue
+import threading
 import time
 #from symbol import return_stmt
 
@@ -17,6 +18,7 @@ import schedule
 import requests
 import json
 import paho.mqtt.client as mqtt
+import random
 
 from scapy.layers.inet import TCP, UDP
 
@@ -32,6 +34,29 @@ rtp_107_packets = []
 namespaces = {'tt': 'http://www.onvif.org/ver10/schema'}
 payload_data = ""
 xml_buffer = b''
+wait_time = 10
+pic_quality = 80
+mac_address = ""
+mqtt_client_obj = None
+capture_queue = deque(maxlen=1)
+frame_buffer = threading.Lock()
+
+config = open('./config.json', 'r')
+data = json.load(config)
+
+name = data['name']
+user = data['user']
+password = urllib.parse.quote_plus(data['password'])
+server_ip = data['cam_ip']
+url = data['rtsp_url']
+
+broker_ip = data['mqtt_connect']['broker_ip']
+mqtt_port = data['mqtt_connect']['port']
+mqtt_user = data['mqtt_connect']['user']
+mqtt_password = data['mqtt_connect']['password']
+topic = data['mqtt_connect']['topic']
+client_id = f'mqtt-client-{random.randint(0, 1000)}'
+
 
 def is_rtp_packet(data):
     """データがRTPパケットかどうかを判定する"""
@@ -181,6 +206,7 @@ def packet_callback(packet):
 
 def xml_107_analyze():
     global exec_queue
+    a = ""
     payload_data = exec_queue.get()
     try:
 
@@ -197,6 +223,9 @@ def xml_107_analyze():
     frame = root.find('.//tt:Frame', namespaces)
     utc_time = frame.get('UtcTime') if frame is not None else "時刻情報なし"
     print(utc_time)
+    a += "{"
+    a += '"timestamp" : "' + utc_time + '",'
+    a += '"Objects" : {'
 
     object_count_elem = root.find('.//Property[@name="ObjectCount"]')
     object_count = object_count_elem.text if object_count_elem is not None else "不明"
@@ -209,23 +238,61 @@ def xml_107_analyze():
 
         # オブジェクトID
         obj_id = obj.get('ObjectId')
-        #print(f"ID: {obj_id}")
+        print(f"ID: {obj_id}")
 
         speed_elem = obj.find('.//tt:Speed', namespaces)
         if speed_elem is not None:
             speed = speed_elem.text
-        #    print(f"速度: {speed}")
+            print(f"速度: {speed}")
+        mes = '"' + str(obj_id) + '" : "' + str(speed) + '",'
+        a += mes
     print("===")
+
+    frame_data = get_frame()
+    a = a[0:-1]
+    a += '},'
+    a += '"MACaddress" : "' + mac_address + '",'
+    a += '"name" : "' + name + '",'
+    a += '"frame_data" : "' + frame_data + '"}'
+    json_send = json.dumps(a)
+    #json_send = a
+    #print(json_send)
+    #print(mac_address)
+    #print(name)
+    #print(json_send)
+    mqtt_client_obj.publish(topic, json_send)
+
     return
 
+def get_frame():
+    global capture_queue
+    with frame_buffer:
+        if frame_buffer:
+            latest_frame = capture_queue[-1].copy()
+        else:
+            latest_frame = None
+    if latest_frame is not None:
+        ret, jpeg = cv2.imencode('.jpg', latest_frame, [int(cv2.IMWRITE_JPEG_QUALITY), pic_quality])
+        if ret:
+            data = jpeg.tobytes()
+            b64_str = base64.b64encode(jpeg).decode('ascii')
+    else:
+        data = None
+    return b64_str
+
+
+    latest_frame = capture_queue.get()
+
+    if capture_queue.full():
+        print("full")
+
+    return latest_frame
 
 def scheduler_exec():
     """スケジューラを実行するスレッド関数"""
-    # 5分ごとに処理を実行するようにスケジュール
-    print("スケジューラを開始しました (10秒間隔)...")
+    # 指定した時間ごとに処理を実行するようにスケジュール
 
-    schedule.every(9).seconds.do(xml_107_analyze)
-    #sleep1秒入れてるから10秒間隔実行にしている
+    schedule.every(wait_time).seconds.do(xml_107_analyze)
     while not stop_capture:
         schedule.run_pending()
         time.sleep(1)
@@ -359,6 +426,15 @@ def get_all_local_ips():
             interfaces[ip] = interface
     return ips, interfaces
 
+def get_all_mac():
+    macs = {}
+    for iface in netifaces.interfaces():
+            addrs = netifaces.ifaddresses(iface)
+            mac = addrs.get(netifaces.AF_LINK)
+            if mac:
+                    macs[iface] = mac[0]['addr']
+    return macs
+
 
 def extract_server_ip(rtsp_url):
     """RTSP URLからサーバーIPアドレスを抽出する"""
@@ -409,11 +485,14 @@ def start_packet_capture(server_ip, interface):
     # RTSPは通常TCP/554、RTPはUDPの様々なポートを使用、TCP上のRTPも含む
     filter_str = f"host {server_ip} and (tcp port 554 or udp)"
 
-    print(f"\nフィルタ: {filter_str}")
-    print(f"インターフェース: {interface}")
-    print("パケットキャプチャを開始します...")
+    #print(f"\nフィルタ: {filter_str}")
+    #print(f"インターフェース: {interface}")
+    #print("パケットキャプチャを開始します...")
     #print("特に DynamicRTP-Type-107 パケットを監視しています...")
     #print("TCP上のRTP (インターリーブドモード) も検出します...")
+
+    #mqtt_worker = threading.Thread(target=mqtt_thread, daemon=True)
+    #mqtt_worker.start()
 
     # キャプチャスレッド
     capture_thread = threading.Thread(
@@ -443,11 +522,14 @@ def start_packet_capture(server_ip, interface):
     scheduler_thread.daemon = True
     scheduler_thread.start()
 
+
+
     return capture_thread, display_thread, rtp_107_thread, scheduler_thread
 
 
 def run_video_display(rtsp_url, capture_thread, threads):
     global rtp_107_packets
+    global capture_queue
     """映像表示を実行する関数"""
     # OpenCVでRTSPストリームを開く
     print(f"RTSPストリームに接続: {rtsp_url}")
@@ -486,28 +568,31 @@ def run_video_display(rtsp_url, capture_thread, threads):
                 print("フレーム取得失敗")
                 break
 
+            with frame_buffer:
+                capture_queue.append(frame)
+
             # 現在のタイムスタンプを表示
-            cv2.putText(
-                frame,
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                (15, 50),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.5,
-                (0, 255, 0),
-                1
-            )
+            #cv2.putText(
+            #    frame,
+            #    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            #    (15, 50),
+            #    cv2.FONT_HERSHEY_SIMPLEX,
+            #    0.5,
+            #    (0, 255, 0),
+            #    1
+            #)
 
             # RTP-107パケットカウントを表示
-            rtp_107_count = rtp_107_queue.qsize()
-            cv2.putText(
-                frame,
-                f"metadata: {len(rtp_107_packets)}",
-                (10, 70),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.5,
-                (0, 255, 255),
-                2
-            )
+            #rtp_107_count = rtp_107_queue.qsize()
+            #cv2.putText(
+            #    frame,
+            #    f"metadata: {len(rtp_107_packets)}",
+            #    (10, 70),
+            #    cv2.FONT_HERSHEY_SIMPLEX,
+            #    0.5,
+            #    (0, 255, 255),
+            #    2
+            #)
 
             #cv2.imshow('RTSP Stream', frame)
 
@@ -525,52 +610,51 @@ def run_video_display(rtsp_url, capture_thread, threads):
         #cv2.destroyAllWindows()
 
 
-def mqtt_connect(broker, port, username=None, password=None):
+def mqtt_connect(config):
+    global mqtt_client_obj
     client = mqtt.Client()
 
-    if username and password:
-        client.username_pw_set(username, password)
+    client.username_pw_set(config[2], config[3])
+    connect_result = {"rc" : None}
 
-    # 接続成功時
     def on_connect(client, userdata, flags, rc):
+        connect_result["rc"] = rc
         print(f"[MQTT] Connected with result code {rc}")
 
-    # 切断時
     def on_disconnect(client, userdata, rc):
+        connect_result["rc"] = rc
         print(f"[MQTT] Disconnected. rc={rc}")
 
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
 
-    client.connect(broker, port, keepalive=60)
+    client.connect(str(config[0]), int(config[1]))
     client.loop_start()
+    mqtt_client_obj = client
 
     return client
 
-
-def send(context):
-    send_message = context
-    json_data = json.dumps(send_message)
-    response = requests.post("https:///post", data=json_data)
-    print(response.text)
+def mqtt_thread(config):
+    client = mqtt_connect(config)
 
 
 def main():
     global stop_capture
+    global mac_address
 
-    config = open('./config.json', 'r')
-    data = json.load(config)
+    mqtt_info = [broker_ip, mqtt_port, mqtt_user, mqtt_password]
 
-    user = data['user']
-    password = urllib.parse.quote_plus(data['password'])
-    server_ip = data['cam_ip']
-    url = data['url']
+    #client = mqtt_connect(broker_ip, mqtt_port, mqtt_user, mqtt_password, client_id, topic)
 
-    mqtt_user = data['mqtt_connect']['user']
-    mqtt_password = data['mqtt_connect']['password']
-    topic = data['mqtt_connect']['topic']
+    mqtt_worker = threading.Thread(target=mqtt_thread, args=(mqtt_info,))
+    mqtt_worker.daemon = True
+    mqtt_worker.start()
 
-
+    #time.sleep(10)
+    #result = mqtt_client_obj.publish(topic, "test message.")
+    #print(result)
+    #time.sleep(10)
+    #exit()
     #parser = argparse.ArgumentParser(description='RTSPストリームビューアとパケットキャプチャ (RTP-107検出機能付き)')
     #parser.add_argument('--url', '-u', help='RTSP URL', default=f"rtsp://{user}:{password}@{server_ip}/ONVIF/MediaInput?profile=def_profile4")
     #parser.add_argument('--no-video', '-n', action='store_true', help='映像表示を無効化（パケットキャプチャのみ）')
@@ -584,6 +668,10 @@ def main():
     # キャプチャインターフェースを選択
     #interface = select_capture_interface()
     interface = get_all_interfaces()[0]
+    print(interface)
+    mac_address = get_all_mac()[interface]
+
+    print(name)
     if not interface:
         print("インターフェースが選択されていません。終了します。")
         return
