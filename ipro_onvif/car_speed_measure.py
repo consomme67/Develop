@@ -19,6 +19,7 @@ import requests
 import json
 import paho.mqtt.client as mqtt
 import random
+import ipaddress
 
 from scapy.layers.inet import TCP, UDP
 
@@ -35,7 +36,7 @@ namespaces = {'tt': 'http://www.onvif.org/ver10/schema'}
 payload_data = ""
 xml_buffer = b''
 wait_time = 10
-pic_quality = 80
+pic_quality = 20
 mac_address = ""
 mqtt_client_obj = None
 capture_queue = deque(maxlen=1)
@@ -435,6 +436,37 @@ def get_all_mac():
                     macs[iface] = mac[0]['addr']
     return macs
 
+def find_interface_by_target_ip(target_ip):
+    """
+    target_ip: "192.168.10.50" のようにコンフィグから渡すIP
+    """
+    target = ipaddress.ip_address(target_ip)
+
+    for iface in netifaces.interfaces():
+        addrs = netifaces.ifaddresses(iface)
+
+        # IPv4のみ扱う
+        if netifaces.AF_INET not in addrs:
+            continue
+
+        for addr_info in addrs[netifaces.AF_INET]:
+            ip = addr_info.get('addr')
+            netmask = addr_info.get('netmask')
+
+            if not ip or not netmask:
+                continue
+
+            try:
+                network = ipaddress.ip_network(f"{ip}/{netmask}", strict=False)
+            except ValueError:
+                continue
+
+            # 同じネットワークに属するか？
+            if target in network:
+                return iface
+
+    return None
+
 
 def extract_server_ip(rtsp_url):
     """RTSP URLからサーバーIPアドレスを抽出する"""
@@ -667,7 +699,11 @@ def main():
 
     # キャプチャインターフェースを選択
     #interface = select_capture_interface()
-    interface = get_all_interfaces()[0]
+    #interface = get_all_interfaces()[0]
+    if find_interface_by_target_ip(server_ip) is None:
+        exit()
+    interface = find_interface_by_target_ip(server_ip)
+
     print(interface)
     mac_address = get_all_mac()[interface]
 
