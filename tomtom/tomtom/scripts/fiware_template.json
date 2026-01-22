@@ -1,0 +1,34 @@
+{
+	"asset_ID" : {
+		"type" : "Text",
+		"value" : {asset_ID}
+	},
+	"use_case_ID" : {
+		"type" : "Text",
+		"value" : "Traffic Congestion"
+	},
+        "asset_name" : {
+                "type" : "Text",
+                "value" : {asset_name}
+        },
+        "use_case_name" : {
+                "type" : "Text",
+                "value" : "koutu konnzatsu"
+        },
+        "asset_model" : {
+                "type" : "Text",
+                "value" : "Route Monitoring"
+        },
+        "datetime" : {
+                "type" : "Text",
+                "value" : {datetime}
+        },
+        "segment_states" : {
+                "type" : "Property",
+                "value" : {segment_data}
+#			"segment_no" : {no},
+#			"segment_id" : {segmentId},
+#			"current_speed" : {currentSpeed},
+#			"segment_Length" : {segmentLength}
+        }
+}
