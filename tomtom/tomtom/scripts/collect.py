@@ -5,26 +5,26 @@ import os
 from string import Template
 from datetime import datetime, timezone, timedelta
 
+#デバッグ用
+debug = False
+
 
 class CrowdLevel:
 	def __init__(self, place: str, point: str, name: str, raw_json=None, ptr=3):
 		self.place = place
 		self.name = name
 		self.point = point
-#		print(f'{type(ptr)} : {ptr}')
 		self.ptr = ptr
 		self.raw_json = raw_json
 		self.write_data = None
 
-	def test(self):
-		print(len(self.path))
-		#print(len(self.raw_json))
-		#print(len(self.raw_json["detailedSegments"]))
-
-		#print(self.format_data())
+	def debug_mode(self):
+		for key, value in self.__dict__.items():
+			print("===============")
+			print(f"{key}: {value}")
+			print("===============")
 
 	def format(self):
-		#print(self.place)
 		list = []
 		self.segments = []
 
@@ -34,10 +34,7 @@ class CrowdLevel:
 
 			#監視地点から設定した取得セグメントの情報をまとめる
 			if self.point == i["segmentIdStr"]:
-#				print(f'{self.place} : OK!')
-
 				idx = list.index(self.point)
-#				print(f'{type(self.ptr)} : {self.ptr}')
 				for k in range(self.ptr):
 					data = {"segment_no" : k+1,
 							"segment_id" : self.raw_json["detailedSegments"][idx]["segmentIdStr"],
@@ -46,11 +43,9 @@ class CrowdLevel:
 							}
 					self.segments.append(data)
 					idx = idx - 1
-				print(self.segments)
-				print("===")
 
 				return self
-#		print(f'{self.point} ===>?  {i["segmentIdStr"]} ')
+
 
 	def write(self):
 		try:
@@ -77,8 +72,6 @@ class CrowdLevel:
 		with open(out_path, mode="w") as f:
 			f.write(json.dumps(self.write_data, ensure_ascii=False, indent=2))
 		return self
-
-
 
 
 def load_config(path):
@@ -113,13 +106,11 @@ def main():
 			cl = CrowdLevel(i, observePoints[i], observeNames[i], raw_json, int(pathToReaches[i]))
 		else :
 			cl = CrowdLevel(i, observePoints[i], observeNames[i], raw_json)
-		
+
+		if debug:
+			cl.debug_mode()
 		cl.format()
-		#cl.test()
-
-
-#	print(out_dir)
-#	print(url)
+		cl.write()
 
 if __name__ == "__main__":
 	main()
