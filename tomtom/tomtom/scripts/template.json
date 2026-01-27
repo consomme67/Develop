@@ -1,0 +1,23 @@
+{
+  "data_name1" : "asset_ID",
+  "data_type1" : "Text",
+  "data_value1" : "$asset_ID",
+  "data_name2" : "use_case_ID",
+  "data_type2" : "Text",
+  "data_value2" : "Traffic-Congestion",
+  "data_name3" : "asset_name",
+  "data_type3" : "Text",
+  "data_value3" : "$asset_name",
+  "data_name4" : "use_case_name",
+  "data_type4" : "Text",
+  "data_value4" : "交通混雑計測",
+  "data_name5" : "asset_model",
+  "data_type5" : "Text",
+  "data_value5" : "RouteMonitoring",
+  "data_name6" : "datetime",
+  "data_type6" : "Text",
+  "data_value6" : "$datetime",
+  "data_name101" : "traffic_states",
+  "data_type101" : "Text",
+  "data_value101" : "$data"
+}
