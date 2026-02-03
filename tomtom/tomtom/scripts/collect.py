@@ -4,13 +4,15 @@ import configparser
 import os
 from string import Template
 from datetime import datetime, timezone, timedelta
+import paho.mqtt.client as mqtt
 
 #デバッグ用
 debug = False
 
 
 class CrowdLevel:
-	def __init__(self, place: str, point: str, name: str, raw_json=None, ptr=3):
+	def __init__(self, client, place: str, point: str, name: str, raw_json=None, ptr=3):
+		self.client = client
 		self.place = place
 		self.name = name
 		self.point = point
@@ -47,13 +49,33 @@ class CrowdLevel:
 				return self
 
 
-	def write(self):
+	def send(self):
 		try:
 			with open("template.json", "r") as f:
 				temp = f.read()
+			#data = json.loads(temp)
 
+			self.get_Time()
+			place = self.place + "001"
+			name = self.name + "001"
 			self.write_data = Template(temp)
-			filled = self.write_data.safe_substitute()
+
+			traffic_states = json.dumps(self.segments)
+
+			#print(traffic_states)
+			filled = self.write_data.safe_substitute(asset_ID=place,
+													 asset_name=name,
+													 datetime=self.dt_jst,
+													 data=traffic_states)
+
+			obj = json.dumps(filled)
+			tmp = json.loads(filled)
+
+			tenant = tmp["data_value5"]
+			driver = tmp["data_value2"]
+			obj = json.dumps(tmp)
+			topic = f'jp.ehime/{tenant}/{driver}'
+			self.client.publish(topic=topic, qos=0, payload=obj)
 
 		except Exception as e:
 			print(e)
@@ -62,9 +84,9 @@ class CrowdLevel:
 	def get_Time(self):
 		jst = timezone(timedelta(hours=9))
 		now_jst = datetime.now(jst)
-		dt_jst = now_jst.strftime("%Y-%m-%dT%H:%M:%S+09:00")
+		self.dt_jst = now_jst.strftime("%Y-%m-%dT%H:%M:%S+09:00")
 
-		return dt_jst
+		return self
 
 	def save(self, out_dir):
 		os.makedirs(out_dir, exist_ok = True)
@@ -72,6 +94,21 @@ class CrowdLevel:
 		with open(out_path, mode="w") as f:
 			f.write(json.dumps(self.write_data, ensure_ascii=False, indent=2))
 		return self
+
+def connect_mqtt(mqttuser):
+	client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
+	user = mqttuser["user"]
+	password = mqttuser["password"]
+	host = mqttuser["host"]
+
+	client.username_pw_set(
+		username=user,
+		password=password
+	)
+
+	client.connect(host, 1883, 60)
+	client.loop_start()
+	return client
 
 
 def load_config(path):
@@ -87,6 +124,7 @@ def main():
 	observeNames = config["ObserveNames"]
 	observePoints = config["ObservePoints"]
 	pathToReaches = config["PathToReaches"]
+	mqttuser = config['MqttUser']
 
 	try :
 		raw_data = requests.get(url, timeout = 10)
@@ -98,19 +136,31 @@ def main():
 		print(e)
 		exit()
 
-	#kaku titen gotoni syori
-	for i in observePoints:
-#		print(f'{i} ==> {observePoints[i]} ===> {observeNames[i]}')
-		if i in pathToReaches:
+	try :
+		mqtt_client = connect_mqtt(mqttuser)
 
-			cl = CrowdLevel(i, observePoints[i], observeNames[i], raw_json, int(pathToReaches[i]))
-		else :
-			cl = CrowdLevel(i, observePoints[i], observeNames[i], raw_json)
 
-		if debug:
-			cl.debug_mode()
-		cl.format()
-		cl.write()
+		#kaku titen gotoni syori
+		for i in observePoints:
+	#		print(f'{i} ==> {observePoints[i]} ===> {observeNames[i]}')
+			if i in pathToReaches:
+
+				cl = CrowdLevel(mqtt_client, i, observePoints[i], observeNames[i], raw_json, int(pathToReaches[i]))
+			else :
+				cl = CrowdLevel(mqtt_client, i, observePoints[i], observeNames[i], raw_json)
+
+			if debug:
+				cl.debug_mode()
+			cl.format()
+			cl.send()
+		mqtt_client.loop_stop()
+		mqtt_client.disconnect()
+
+	except Exception as e:
+		print(e)
+
+		mqtt_client.loop_stop()
+		mqtt_client.disconnect()
 
 if __name__ == "__main__":
 	main()
